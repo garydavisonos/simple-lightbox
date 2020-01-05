@@ -3,17 +3,17 @@ if($lightboxes){
     $lightboxes.forEach((lightbox) => {
         lightbox.addEventListener("click", (e)=> {
             // create
+            let caption = e.target.getAttribute("title");
+            const lightboxId = Math.floor(Math.random() * 1000000); 
             let imgPath = e.target.getAttribute("src");
             let $figure = document.createElement("figure");
             let $img = document.createElement("img");
             let $body = document.querySelector("body");
             let $overlay = document.createElement("div");
             let $close = document.createElement("span");
-            let caption = e.target.getAttribute("title");
-            const lightboxId = Math.floor(Math.random() * 1000000); 
             // config
-            let classes = ["overlay", "simple-lightbox"];
-            $overlay.classList.add(...classes);
+            let overlayClasses = ["overlay", "simple-lightbox"];
+            $overlay.classList.add(...overlayClasses);
             $close.innerHTML = "x";
             $close.classList.add("close");
             if(lightboxId){
@@ -35,9 +35,15 @@ if($lightboxes){
             $overlay.insertAdjacentElement("beforeend", $figure);
             $body.insertAdjacentElement("beforeend", $overlay);
             // close
-            document.querySelector("#lightbox-" + lightboxId).addEventListener("click", (e) => {
+            let $lightbox = document.querySelector("#lightbox-" + lightboxId);
+            $lightbox.addEventListener("click", (e) => {
                 if(e.target.tagName !== "IMG"){
-                    document.querySelector("#lightbox-" + lightboxId).remove();
+                    $lightbox.classList.add("overlay--close");
+                    $lightbox.addEventListener("transitionend", (e) => {
+                        if(e.propertyName === "visibility"){
+                            $lightbox.remove();
+                        }
+                    });                    
                 }
             });
         });
