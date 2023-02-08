@@ -19,7 +19,6 @@
     }
 }
 
-
 .overlay {
     animation-duration: 0.25s;
     animation-fill-mode: forwards;
@@ -79,3 +78,12 @@
         background: black;
         color: white;
     }
+
+img[data-simple-lightbox] {
+    cursor: pointer;
+}
+
+.disabled {
+    cursor: none;
+    pointer-events: none;
+}

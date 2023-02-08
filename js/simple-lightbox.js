@@ -1,51 +1,119 @@
-var $lightboxes = document.querySelectorAll("img[data-simple-lightbox]");
-if($lightboxes){
-    $lightboxes.forEach((lightbox) => {
-        lightbox.addEventListener("click", (e)=> {
-            // create
-            let caption = e.target.getAttribute("title");
-            const lightboxId = Math.floor(Math.random() * 1000000); 
-            let imgPath = e.target.getAttribute("src");
-            let $figure = document.createElement("figure");
-            let $img = document.createElement("img");
-            let $body = document.querySelector("body");
-            let $overlay = document.createElement("div");
-            let $close = document.createElement("span");
-            // config
-            let overlayClasses = ["overlay", "simple-lightbox"];
-            $overlay.classList.add(...overlayClasses);
-            $close.innerHTML = "x";
-            $close.classList.add("close");
-            if(lightboxId){
-                $close.setAttribute("id", "close-" + lightboxId);
-                $overlay.setAttribute("id", "lightbox-" + lightboxId);
-            }
-            if(imgPath){
-                $img.setAttribute("src", imgPath);
-            }
-            let $figCaption = document.createElement("figcaption");
-            $figCaption.innerHTML = caption;
-            $figCaption.classList.add("caption");
-            // insert
-            $figure.insertAdjacentElement("beforeend", $img);
-            if(caption){
-                $figure.insertAdjacentElement("beforeend", $figCaption);
-            }
-            $figure.insertAdjacentElement("beforeend", $close);
-            $overlay.insertAdjacentElement("beforeend", $figure);
-            $body.insertAdjacentElement("beforeend", $overlay);
-            // close
-            let $lightbox = document.querySelector("#lightbox-" + lightboxId);
-            $lightbox.addEventListener("click", (e) => {
-                if(e.target.tagName !== "IMG"){
-                    $lightbox.classList.add("overlay--close");
-                    $lightbox.addEventListener("transitionend", (e) => {
-                        if(e.propertyName === "visibility"){
-                            $lightbox.remove();
-                        }
-                    });                    
-                }
-            });
-        });
+//// Funcs
+
+const isArr = (arr) => {
+  return Array.isArray(arr);
+};
+
+const isObj = (obj) => {
+  return obj && typeof obj === "object" && obj.constructor === Object;
+};
+
+const isStr = (str) => {
+  return typeof str === "string";
+};
+
+const isDomElem = (elem) => {
+  return elem instanceof HTMLElement;
+};
+
+const createArr = (items) => {
+  return Array.prototype.slice.call(items);
+};
+
+const createElem = (elem, insert, classes = [], attrs = [], content) => {
+  if (!elem && !insert) return null;
+
+  const newElem = document.createElement(elem);
+
+  // Add classes
+  if (isArr(classes) && classes.length > 0) {
+    newElem.classList.add(...classes);
+  }
+
+  // Add attrs
+  if (isArr(attrs) && attrs.length > 0) {
+    attrs
+      .filter((item) => isObj(item))
+      .forEach((item) => {
+        return newElem.setAttribute(
+          Object.keys(item)[0],
+          Object.values(item)[0]
+        );
+      });
+  }
+
+  // Add innerHtml
+  if (isStr(content)) {
+    newElem.innerHTML = content;
+  }
+
+  // Check that insert is a DOM element
+  const domElem = document.querySelector(insert);
+
+  if (!isDomElem(domElem)) {
+    console.error("DOM Element doesn't exist");
+  }
+
+  return domElem.insertAdjacentElement("beforeend", newElem);
+};
+
+const deleteElem = () => {
+  const close = document.querySelector(".close");
+  const overlay = document.querySelector(".overlay");
+  const img = document.querySelector(".disabled");
+
+  if (isDomElem(close) && isDomElem(overlay)) {
+    close.addEventListener("click", (e) => {
+      overlay.classList.add("overlay--close");
+
+      overlay.addEventListener("transitionend", (e) => {
+        if (e.propertyName === "visibility") {
+          // Enable imgs again
+          if (isDomElem(img)) {
+            lightboxes.forEach((item) => item.classList.remove("disabled"));
+          }
+
+          overlay.remove();
+        }
+      });
     });
+  }
+};
+
+//// Logic
+
+const lightboxes = createArr(
+  document.querySelectorAll("img[data-simple-lightbox]")
+);
+
+if (isArr(lightboxes) && lightboxes.length > 0) {
+  lightboxes.forEach((item) => {
+    item.addEventListener("click", (e) => {
+      const path = e.target.getAttribute("src");
+      const caption = e.target.getAttribute("title");
+
+      //// Disabled
+      lightboxes.forEach((item) => item.classList.add("disabled"));
+
+      //// Create
+
+      // Overlay
+      createElem("overlay", "body", ["overlay", "simple-lightbox"]);
+
+      // Figure
+      createElem("figure", ".overlay", ["overlay__image"]);
+
+      // Img
+      createElem("img", ".overlay__image", [], [{ src: path }]);
+
+      // Caption
+      createElem("figcaption", ".overlay__image", ["caption"], [], caption);
+
+      // Close
+      createElem("span", ".overlay__image", ["close"], [], "x");
+
+      // Delete Func
+      deleteElem();
+    });
+  });
 }
