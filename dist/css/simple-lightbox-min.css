@@ -1,0 +1,89 @@
+@keyframes overlayFadeIn {
+    0% {
+        opacity: 0;
+        visibility: hidden;
+    }
+    100% {
+        opacity: 1;
+        visibility: visible;
+    }
+}
+@keyframes overlayFadeOut {
+    0% {
+        opacity: 1;
+        visibility: visible;
+    }
+    100% {
+        opacity: 0;
+        visibility: hidden;
+    }
+}
+
+.overlay {
+    animation-duration: 0.25s;
+    animation-fill-mode: forwards;
+    animation-name: overlayFadeIn;
+    align-items: center;
+    background: rgba(0,0,0,0.75);
+    bottom: 0;
+    display: flex;
+    font-family: Arial, Helvetica, sans-serif;
+    justify-content: center;
+    left: 0;
+    opacity: 0;
+    pointer-events: all;
+    position: fixed;
+    right: 0;
+    top: 0;
+    visibility: hidden;
+    z-index: 9999;
+}
+    .overlay.overlay--close {
+        animation-duration: 0.25s;
+        animation-fill-mode: forwards;
+        animation-name: overlayFadeOut;
+        visibility: hidden;
+    }
+    .overlay figure {
+        position: relative;
+    }
+    .overlay figcaption {
+        color: white;
+        display: block;
+        font-size: .75rem;
+        font-style: italic;
+        padding: .5rem 0;
+        text-transform: capitalize;
+    }
+    .overlay .close {
+        align-items: center;
+        background: white;
+        border-radius: 100%;
+        box-sizing: border-box;
+        color: black;
+        cursor: pointer;
+        display: flex;
+        height: 25px;
+        font-weight: bold;
+        justify-content: center;
+        padding-bottom: .1rem;
+        pointer-events: all;
+        position: absolute;
+        right: -25px;
+        top: -25px;
+        transition: all .5s;
+        width: 25px;
+    }
+    .overlay .close:hover, .overlay .close:focus {
+        background: black;
+        color: white;
+    }
+
+img[data-simple-lightbox] {
+    cursor: pointer;
+}
+
+.disabled {
+    cursor: none;
+    pointer-events: none;
+}
